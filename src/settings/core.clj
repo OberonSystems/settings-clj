@@ -1,4 +1,4 @@
-(ns settings
+(ns settings.core
   (:require [clojure.string :as s]
             [clojure.java.io :as io]
             [clojure.walk :refer [postwalk]]))
