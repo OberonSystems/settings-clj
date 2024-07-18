@@ -3,6 +3,23 @@
             [clojure.java.io :as io]
             [clojure.walk :refer [postwalk]]))
 
+;;;
+
+(defn parse-boolean
+  [v]
+  ;; Tests for the negative case, everything else is considered true.
+  (let [v (-> s/trim s/lower-case)]
+    (-> (or (s/blank? v)
+            ;; for `false`
+            (s/starts-with? v "f")
+            ;; for `no`
+            (s/starts-with? v "n")
+            ;; for `0`
+            (s/starts-with? v "0"))
+        not)))
+
+;;;
+
 (defn env-var?
   [v]
   (and (map? v)
@@ -26,6 +43,12 @@
   [{:keys [env-name default]}]
   (or (some-> env-name get-env-var* Integer/parseInt)
       default))
+
+(defmethod get-env-var :boolean
+  [{:keys [env-name default]}]
+  (or (some-> env-name get-env-var* parse-boolean)
+      default
+      false))
 
 (defn resolve-env-vars
   [m]
