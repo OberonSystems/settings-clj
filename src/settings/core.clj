@@ -5,7 +5,14 @@
 
 ;;;
 
-(defn parse-boolean
+(defn var->integer
+  [v]
+  ;; Tests for the negative case, everything else is considered true.
+  (let [v (s/trim v)]
+    (when-not (s/blank? v)
+      (Integer/parseInt v))))
+
+(defn var->boolean
   [v]
   ;; Tests for the negative case, everything else is considered true.
   (let [v (-> s/trim s/lower-case)]
@@ -41,12 +48,12 @@
 
 (defmethod get-env-var :integer
   [{:keys [env-name default]}]
-  (or (some-> env-name get-env-var* Integer/parseInt)
+  (or (some-> env-name get-env-var* var->integer)
       default))
 
 (defmethod get-env-var :boolean
   [{:keys [env-name default]}]
-  (or (some-> env-name get-env-var* parse-boolean)
+  (or (some-> env-name get-env-var* var->boolean)
       default
       false))
 
